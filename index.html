@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #startButton {
+      position: fixed;
+      z-index: 10;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 16px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: white;
+    }
+  </style>
+</head>
+
+<body>
+
+<button id="startButton">START AR</button>
+
+<a-scene
+  mindar-image="
+    imageTargetSrc: ./targets.mind;
+    maxTrack: 2;
+    uiScanning: yes;
+  "
+  color-space="sRGB"
+  renderer="colorManagement: true, physicallyCorrectLights"
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false"
+  embedded
+>
+
+  <a-assets>
+
+    <!-- Temporary test video 1 -->
+    <video
+      id="video1"
+      src="https://cdn.glitch.global/aac91519-95ff-4996-8909-e5c41f3cfff9/mov_bbb.mp4"
+      preload="auto"
+      loop
+      playsinline
+      crossorigin="anonymous">
+    </video>
+
+    <!-- Temporary test video 2 -->
+    <video
+      id="video2"
+      src="https://cdn.glitch.global/aac91519-95ff-4996-8909-e5c41f3cfff9/mov_bbb.mp4"
+      preload="auto"
+      loop
+      playsinline
+      crossorigin="anonymous">
+    </video>
+
+  </a-assets>
+
+  <a-camera
+    position="0 0 0"
+    look-controls="enabled: false">
+  </a-camera>
+
+  <!-- PHOTO 1 → VIDEO 1 -->
+  <a-entity
+    id="target1"
+    mindar-image-target="targetIndex: 0">
+
+    <a-video
+      src="#video1"
+      position="0 0 0"
+      width="1"
+      height="0.56">
+    </a-video>
+
+  </a-entity>
+
+  <!-- PHOTO 2 → VIDEO 2 -->
+  <a-entity
+    id="target2"
+    mindar-image-target="targetIndex: 1">
+
+    <a-video
+      src="#video2"
+      position="0 0 0"
+      width="1"
+      height="0.56">
+    </a-video>
+
+  </a-entity>
+
+</a-scene>
+
+<script>
+
+  const startButton = document.querySelector("#startButton");
+
+  const video1 = document.querySelector("#video1");
+  const video2 = document.querySelector("#video2");
+
+  const target1 = document.querySelector("#target1");
+  const target2 = document.querySelector("#target2");
+
+  startButton.addEventListener("click", async () => {
+
+    startButton.style.display = "none";
+
+    try {
+      await video1.play();
+      video1.pause();
+
+      await video2.play();
+      video2.pause();
+
+    } catch (error) {
+      console.log(error);
+    }
+
+  });
+
+  target1.addEventListener("targetFound", () => {
+    video1.currentTime = 0;
+    video1.play();
+  });
+
+  target1.addEventListener("targetLost", () => {
+    video1.pause();
+  });
+
+  target2.addEventListener("targetFound", () => {
+    video2.currentTime = 0;
+    video2.play();
+  });
+
+  target2.addEventListener("targetLost", () => {
+    video2.pause();
+  });
+
+</script>
+
+</body>
+</html> 
