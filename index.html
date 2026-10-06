@@ -1,52 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width,
+                 initial-scale=1.0,
+                 maximum-scale=1.0,
+                 user-scalable=no">
 
-  <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+  <title>AR Magazine Test</title>
+
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
+      background: #000;
     }
 
-    #startButton {
-      position: fixed;
-      z-index: 10;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      padding: 16px 25px;
-      font-size: 18px;
-      border: none;
-      border-radius: 10px;
-      background: white;
+    a-scene {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+    }
+
+    .a-canvas {
+      width: 100% !important;
+      height: 100% !important;
     }
   </style>
 </head>
 
 <body>
 
-<button id="startButton">START AR</button>
-
 <a-scene
   mindar-image="
     imageTargetSrc: ./targets.mind;
     maxTrack: 2;
-    uiScanning: yes;
+    uiScanning: true;
+    uiLoading: true;
   "
-  color-space="sRGB"
-  renderer="colorManagement: true, physicallyCorrectLights"
+  embedded
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
-  embedded
->
+  renderer="colorManagement: true; physicallyCorrectLights: true">
 
   <a-assets>
 
-    <!-- Temporary test video 1 -->
     <video
       id="video1"
       src="https://cdn.glitch.global/aac91519-95ff-4996-8909-e5c41f3cfff9/mov_bbb.mp4"
@@ -56,7 +62,6 @@
       crossorigin="anonymous">
     </video>
 
-    <!-- Temporary test video 2 -->
     <video
       id="video2"
       src="https://cdn.glitch.global/aac91519-95ff-4996-8909-e5c41f3cfff9/mov_bbb.mp4"
@@ -73,30 +78,30 @@
     look-controls="enabled: false">
   </a-camera>
 
-  <!-- PHOTO 1 → VIDEO 1 -->
+  <!-- TARGET 1 -->
   <a-entity
-    id="target1"
-    mindar-image-target="targetIndex: 0">
+    mindar-image-target="targetIndex: 0"
+    id="target1">
 
     <a-video
       src="#video1"
       position="0 0 0"
       width="1"
-      height="0.56">
+      height="0.5625">
     </a-video>
 
   </a-entity>
 
-  <!-- PHOTO 2 → VIDEO 2 -->
+  <!-- TARGET 2 -->
   <a-entity
-    id="target2"
-    mindar-image-target="targetIndex: 1">
+    mindar-image-target="targetIndex: 1"
+    id="target2">
 
     <a-video
       src="#video2"
       position="0 0 0"
       width="1"
-      height="0.56">
+      height="0.5625">
     </a-video>
 
   </a-entity>
@@ -105,34 +110,17 @@
 
 <script>
 
-  const startButton = document.querySelector("#startButton");
-
   const video1 = document.querySelector("#video1");
   const video2 = document.querySelector("#video2");
 
   const target1 = document.querySelector("#target1");
   const target2 = document.querySelector("#target2");
 
-  startButton.addEventListener("click", async () => {
-
-    startButton.style.display = "none";
-
-    try {
-      await video1.play();
-      video1.pause();
-
-      await video2.play();
-      video2.pause();
-
-    } catch (error) {
-      console.log(error);
-    }
-
-  });
-
   target1.addEventListener("targetFound", () => {
     video1.currentTime = 0;
-    video1.play();
+    video1.play().catch(error => {
+      console.log("Video 1:", error);
+    });
   });
 
   target1.addEventListener("targetLost", () => {
@@ -141,7 +129,9 @@
 
   target2.addEventListener("targetFound", () => {
     video2.currentTime = 0;
-    video2.play();
+    video2.play().catch(error => {
+      console.log("Video 2:", error);
+    });
   });
 
   target2.addEventListener("targetLost", () => {
@@ -151,4 +141,4 @@
 </script>
 
 </body>
-</html> 
+</html>
